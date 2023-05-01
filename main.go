@@ -65,11 +65,11 @@ type Table struct{
 	amountOfPlayers int
 }
 
-func(t Table) createTable(gameMode string, amountOfPlayers int) *Table{
-	return &Table(gameMode, amountOfPlayers)
+func createTable(gameMode string, amountOfPlayers int) *Table{
+	return &Table{gameMode: gameMode, amountOfPlayers: amountOfPlayers}
 }
 
-func startGame(table Table) [][]Card{
+func startGame(table *Table) [][]Card{
 	deck := NewDeck()
 
 	newTable := [][]Card{}
@@ -78,12 +78,24 @@ func startGame(table Table) [][]Card{
 		playerHand := []Card{}
 
 		for j := 0; j < numOfCards(table); j++{
-			
+			card := deck.drawCard()
+			playerHand = append(playerHand, card)
 		}
+		newTable = append(newTable, playerHand);
+	}
+	return newTable
+}
+
+func numOfCards(table *Table) int{
+	if table.gameMode == "Pair of Cards"{
+		return 5
+	}else{
+		return 2
 	}
 }
 
 func main(){
-	deck := NewDeck()
-	deck.drawCard()
+	table := createTable("Pair of Cards",5)
+	game := startGame(table)
+	fmt.Println(game)
 }
