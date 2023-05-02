@@ -15,8 +15,8 @@ func NewCard(suit string, value string, intValue int) *Card {
 	return &Card{suit, value, intValue}
 }
 //Card/getter
-func (c Card) getCardString() string{
-	return c.suit + c.value + "(" + fmt.Sprint(c.intValue) + ")";
+func (c Card) String() string{
+	return c.suit + c.value ;
 }
 
 type Deck struct{
@@ -56,7 +56,6 @@ func (d *Deck) shuffleDeck(){
 func (d *Deck) drawCard() Card{
 	card := d.deck[len(d.deck) - 1]
 	d.deck = d.deck[:len(d.deck) - 1]
-	fmt.Println(card.getCardString())
 	return card
 }
 
@@ -94,8 +93,18 @@ func numOfCards(table *Table) int{
 	}
 }
 
+func printTable(playerCards [][]Card, table *Table){
+	fmt.Println("Amount of players:", table.amountOfPlayers, "Game mode:", table.gameMode)
+	for i := 0; i < table.amountOfPlayers; i++{
+		fmt.Println("player",(i+1), "hand is")
+		for _, v := range playerCards[i] {
+			fmt.Println(v)
+		}
+	}
+}
+
 func main(){
 	table := createTable("Pair of Cards",5)
 	game := startGame(table)
-	fmt.Println(game)
+	printTable(game, table)
 }
