@@ -3,6 +3,7 @@ import (
 	"fmt"
 	"math/rand"
 	"time"
+	"strconv"
 )
 //Cardクラス
 type Card struct{
@@ -95,7 +96,7 @@ func numOfCards(table *Table) int{
 
 func printTable(playerCards [][]Card, table *Table){
 	fmt.Println("Amount of players:", table.amountOfPlayers, "Game mode:", table.gameMode)
-	for i := 0; i < table.amountOfPlayers; i++{
+	for i := 0; i <  table.amountOfPlayers; i++{
 		fmt.Println("player",(i+1), "hand is")
 		for _, v := range playerCards[i] {
 			fmt.Println(v)
@@ -103,8 +104,70 @@ func printTable(playerCards [][]Card, table *Table){
 	}
 }
 
+func winnerOfPairOfCards(playerCards [][]Card, table *Table) string{
+	var orderOfStrength =  []int{1,13,12,11,10,9,8,7,6,5,4,3,2}
+	playerHands := [][]int{}
+	for i := 0; i < table.amountOfPlayers; i++{
+		numArr := convertToNumbers(playerCards[i])
+		playerHands = append(playerHands,numArr)
+	}
+	mapSlice := []map[int]int{}
+	for _,v := range playerHands{
+		hashmap := createHashmap(v,orderOfStrength)
+		mapSlice = append(mapSlice, hashmap)
+	}
+	winPlayer := 1
+	winner := "draw"
+	flag := false
+	for i := 1; i < len(playerHands); i++{
+		pairOfCards := 0
+		for j := 0; j < len(orderOfStrength); j++{
+			if mapSlice[winPlayer - 1][orderOfStrength[j]] > mapSlice[i][orderOfStrength[j]]{
+				if pairOfCards < mapSlice[winPlayer - 1][orderOfStrength[j]]{
+					pairOfCards = mapSlice[winPlayer - 1][orderOfStrength[j]]
+					winner = "player"+ strconv.Itoa(winPlayer)
+					flag = false;
+				}
+			}else if mapSlice[winPlayer - 1][orderOfStrength[j]] < mapSlice[i][orderOfStrength[j]]{
+				if pairOfCards < mapSlice[i][orderOfStrength[j]]{
+					pairOfCards = mapSlice[i][orderOfStrength[j]]
+					winner = "player"+ strconv.Itoa(i+1)
+					flag = true;
+				}
+			}
+		}
+		if flag{
+			winPlayer = i+1
+		}  
+	}
+	fmt.Println("Winner of the game is ")
+	fmt.Println(winPlayer)
+	return winner
+}
+
+func convertToNumbers(playerHands []Card) []int{
+	arr := []int{}
+	for i,_ := range playerHands{
+		arr = append(arr, playerHands[i].intValue)
+	}
+	return arr
+}
+
+func createHashmap(numArr []int,orderOfStrength []int) map[int]int{
+	hashmap := map[int]int{}
+	for _,v := range orderOfStrength{
+		hashmap[v] = 0
+	}
+	for _,v := range numArr{
+		hashmap[v] = (hashmap[v] + 1) 
+	}
+	return hashmap
+
+}
+
 func main(){
 	table := createTable("Pair of Cards",5)
 	game := startGame(table)
 	printTable(game, table)
+	fmt.Println(winnerOfPairOfCards(game, table))
 }
